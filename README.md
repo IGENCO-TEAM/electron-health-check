@@ -1,4 +1,4 @@
-# app
+# Electron Health Check
 
 ## Project setup
 ```
