@@ -1,0 +1,123 @@
+<template>
+  <v-app>
+    <v-app-bar app color="primary" dark>
+      <div class="d-flex align-center">
+        <v-img
+          alt="Vuetify Logo"
+          class="shrink mr-2"
+          contain
+          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
+          transition="scale-transition"
+          width="40"
+        />
+
+        <v-img
+          alt="Vuetify Name"
+          class="shrink mt-1 hidden-sm-and-down"
+          contain
+          min-width="100"
+          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
+          width="100"
+        />
+      </div>
+
+      <v-spacer></v-spacer>
+
+      <v-btn href="https://igenco.co.th/" target="_blank" text>
+        <span class="mr-2">IGENCO</span>
+        <v-icon>mdi-open-in-new</v-icon>
+      </v-btn>
+    </v-app-bar>
+
+    <v-main>
+      <v-container>
+        <v-row class="text-center">
+          <v-col class="mb-4">
+            <h1 class="display-2 font-weight-bold mb-3 ig-color-white">Health Check</h1>
+          </v-col>
+
+          <v-col class="mb-5" cols="12">
+            <v-card class="mx-auto" max-width="344">
+              <!-- <v-row justify="center">
+                <div ref="cpuUse"></div>
+              </v-row> -->
+              <v-list-item three-line>
+                <v-list-item-content>
+                  <div class="text-overline">
+                    <div ref="cpuUse"></div>
+                  </div>
+                </v-list-item-content>
+              </v-list-item>
+            </v-card>
+          </v-col>
+
+          <v-col class="mb-5" cols="12">
+            <v-card class="mx-auto" max-width="344">
+              <!-- <v-row justify="center">
+                <div ref="memUse"></div>
+              </v-row> -->
+              <v-list-item three-line>
+                <v-list-item-content>
+                  <div class="text-overline">
+                    <div ref="memUse"></div>
+                  </div>
+                </v-list-item-content>
+              </v-list-item>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-container>
+
+      <v-footer padless>
+        <v-col class="blue darken-2 text-center" cols="12">
+          {{ new Date().getFullYear() }} —
+          <a href="https://ismartsoft.igenco.co.th/" target="_blank"
+            ><strong class="grey">Ismartsoft TEAM</strong></a
+          >
+        </v-col>
+      </v-footer>
+    </v-main>
+  </v-app>
+</template>
+
+<script>
+export default {
+  name: "App",
+  mounted() {
+    setInterval(() => {
+      this.$electron.ipcRenderer.send("ping:cpu");
+      this.$electron.ipcRenderer.send("ping:mem");
+      // this.$electron.ipcRenderer.send('ping:disk')
+    }, 3000);
+
+    this.$electron.ipcRenderer.on("pong:cpu", (event, data) => {
+      if (typeof data.cpuPercentage !== "undefined") {
+        this.$refs.cpuUse.innerHTML = `CPU usage: ${data.cpuPercentage}%`;
+      }
+    });
+
+    this.$electron.ipcRenderer.on("pong:mem", (event, data) => {
+      if (typeof data.memInfo.usedMemPercentage !== "undefined") {
+        this.$refs.memUse.innerHTML = `Memory usage: ${
+          data.memInfo.usedMemPercentage || 0
+        }%`;
+      }
+    });
+
+    this.$electron.ipcRenderer.on("pong:disk", (event, data) => {
+      console.log(data);
+    });
+  },
+};
+</script>
+
+<style>
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
+}
+</style>
