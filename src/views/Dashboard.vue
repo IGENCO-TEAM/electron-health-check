@@ -1,5 +1,5 @@
 <template>
-  <v-main>
+  <div>
     <v-container>
       <v-row class="text-center">
         <v-col class="mb-4">
@@ -48,7 +48,7 @@
         >
       </v-col>
     </v-footer>
-  </v-main>
+  </div>
 </template>
 
 <script>

@@ -19,6 +19,10 @@
           src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
           width="100"
         />
+
+        <v-btn text @click="goToSettingMenu">
+          <span class="mr-2">SETTING</span>
+        </v-btn>
       </div>
 
       <v-spacer></v-spacer>
@@ -29,13 +33,23 @@
       </v-btn>
     </v-app-bar>
 
-    <router-view />
+    <v-main>
+      <router-view />
+    </v-main>
   </v-app>
 </template>
 
 <script>
 export default {
-  name: "App"
+  name: "App",
+  methods: {
+    goToSettingMenu() {
+      /**
+       * redirect to setting menu [/setting]
+       */
+      this.$router.push({ name: "Setting" });
+    }
+  }
 };
 </script>
 
