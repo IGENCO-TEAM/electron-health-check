@@ -42,6 +42,12 @@
 <script>
 export default {
   name: "App",
+  mounted() {
+    /**
+     * default redirect to dashboard menu [/]
+     */
+    this.$router.push({ name: "Dashboard" });
+  },
   methods: {
     goToSettingMenu() {
       /**
