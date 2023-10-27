@@ -3,10 +3,10 @@ import App from './App.vue'
 
 import "@/assets/scss/app.scss"
 
+import vuetify from './plugins/vuetify'
+
 // Add electron to Vue
 import { ipcRenderer } from 'electron'
-
-import vuetify from './plugins/vuetify'
 Vue.prototype.$electron = { ipcRenderer }
 
 Vue.config.productionTip = false
