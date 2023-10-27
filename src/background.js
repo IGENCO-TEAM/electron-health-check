@@ -3,6 +3,8 @@ import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 const isDevelopment = process.env.NODE_ENV !== "production";
 
+const db = require("./core/lib/sqlite3");
+
 const osu = require("node-os-utils");
 
 // Scheme must be registered before the app is ready
@@ -34,6 +36,7 @@ async function createWindow() {
   }
 }
 
+// eslint-disable-next-line no-unused-vars
 ipcMain.on("ping:cpu", (event, data) => {
   // get cpu usage percentage
   osu.cpu.usage().then(cpuPercentage => {
@@ -43,6 +46,7 @@ ipcMain.on("ping:cpu", (event, data) => {
   });
 });
 
+// eslint-disable-next-line no-unused-vars
 ipcMain.on("ping:mem", (event, data) => {
   osu.mem.info().then(memInfo => {
     event.sender.send("pong:mem", {
@@ -51,8 +55,22 @@ ipcMain.on("ping:mem", (event, data) => {
   });
 });
 
+// eslint-disable-next-line no-unused-vars
 ipcMain.on("ping:disk", (event, data) => {
   console.log(`get drive info`);
+});
+
+// eslint-disable-next-line no-unused-vars
+ipcMain.on("get:setting", (event, data) => {
+  const sql = "SELECT * FROM setting";
+  console.log(sql);
+  db.each(sql, (error, rows) => {
+    if (error) {
+      throw new Error(error.message);
+    }
+    console.log(rows);
+    event.sender.send("rs:setting", rows);
+  });
 });
 
 // Quit when all windows are closed.
