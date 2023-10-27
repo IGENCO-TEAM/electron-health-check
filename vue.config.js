@@ -1,11 +1,18 @@
-const { defineConfig } = require('@vue/cli-service')
+const { defineConfig } = require("@vue/cli-service");
+const path = require("path");
+
 module.exports = defineConfig({
-  transpileDependencies: [
-    'vuetify'
-  ],
+  transpileDependencies: ["vuetify"],
   pluginOptions: {
     electronBuilder: {
-      nodeIntegration: true,
+      nodeIntegration: true
+    }
+  },
+  configureWebpack: {
+    resolve: {
+      alias: {
+        "@": path.resolve(__dirname, "./src")
+      }
     }
   }
-})
+});
