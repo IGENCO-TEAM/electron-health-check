@@ -5,7 +5,7 @@ name: Build Electron App
 #    branches:
 #      - electron
 
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   build_on_linux:
