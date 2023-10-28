@@ -8,6 +8,7 @@
         :src="ismartsoftLogo"
         transition="scale-transition"
         width="50"
+        @click="goToDashboardMenu"
       />
     </div>
 
@@ -40,6 +41,12 @@ export default {
        * redirect to setting menu [/setting]
        */
       this.$router.push({ name: "Setting" });
+    },
+    goToDashboardMenu() {
+      /**
+       * redirect to dashboard menu [/]
+       */
+      this.$router.push({ name: "Dashboard" });
     }
   }
 };

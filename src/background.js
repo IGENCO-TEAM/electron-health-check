@@ -85,6 +85,26 @@ ipcMain.on("get:setting", (event, data) => {
   });
 });
 
+// eslint-disable-next-line no-unused-vars
+ipcMain.on("update:setting", (event, data) => {
+  const sql = `UPDATE setting SET value = '${data.value}' WHERE id = '${data.id}'`;
+  // update
+  db.run(sql, error => {
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    // get all
+    const sql = "SELECT * FROM setting";
+    db.all(sql, (error, rows) => {
+      if (error) {
+        throw new Error(error.message);
+      }
+      event.sender.send("rs:update:setting", rows);
+    });
+  });
+});
+
 // Quit when all windows are closed.
 app.on("window-all-closed", () => {
   // On macOS it is common for applications and their menu bar

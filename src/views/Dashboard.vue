@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row class="text-center">
-      <v-col class="mb-2">
+      <v-col class="mt-5 mb-2">
         <h1 class="display-2 font-weight-bold mb-3 ig-color-white">
           Health Check
         </h1>

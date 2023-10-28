@@ -17,7 +17,12 @@
           <td>{{ item.name }}</td>
           <td>{{ item.value }}</td>
           <td>
-            <v-btn text small color="warning">
+            <v-btn
+              text
+              small
+              color="warning"
+              @click="$emit('update-config', item)"
+            >
               <span class="mr-2">Edit</span>
             </v-btn>
           </td>
@@ -33,7 +38,8 @@ export default {
   props: {
     items: {
       type: Array,
-      required: true
+      required: true,
+      default: () => []
     }
   },
   data() {
