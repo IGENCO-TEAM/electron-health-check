@@ -76,12 +76,11 @@ ipcMain.on("ping:disk", (event, data) => {
 // eslint-disable-next-line no-unused-vars
 ipcMain.on("get:setting", (event, data) => {
   const sql = "SELECT * FROM setting";
-  console.log(sql);
-  db.each(sql, (error, rows) => {
+  // get all
+  db.all(sql, (error, rows) => {
     if (error) {
       throw new Error(error.message);
     }
-    console.log(rows);
     event.sender.send("rs:setting", rows);
   });
 });

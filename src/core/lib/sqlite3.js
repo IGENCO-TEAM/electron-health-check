@@ -30,9 +30,10 @@ const createTable = db => {
   `);
 
   // insert default data
-  db.exec(`
-    INSERT INTO setting (name, value) VALUES ('SLACK_URL_HOOK', 'http://localhost/hook');
-  `);
+  db.exec(
+    `INSERT INTO setting (name, value) VALUES ('SLACK_NAME_HOOK', 'App Health Check');
+     INSERT INTO setting (name, value) VALUES ('SLACK_URL_HOOK', 'http://localhost/hook');`
+  );
 };
 
 module.exports = createDbConnection();

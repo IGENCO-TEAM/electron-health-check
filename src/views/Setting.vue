@@ -1,24 +1,32 @@
 <template>
-  <div>
-    <v-container>
-      <h1>Setting Page</h1>
+  <v-container>
+    <v-row class="text-center">
+      <v-col class="mb-2">
+        <h1 class="display-2 font-weight-bold mb-3 ig-color-white">
+          Setting Health Check
+        </h1>
+      </v-col>
+    </v-row>
 
-      <code>{{ config }}</code>
+    <table-lists :items="configLists" />
 
-      <hr />
-      <v-btn text @click="goToDashboardMenu">
-        <span class="mr-2">Dashbard</span>
-      </v-btn>
-    </v-container>
-  </div>
+    <v-btn color="secondary" class="mt-2" @click="goToDashboardMenu">
+      <span class="mr-2">Dashbard</span>
+    </v-btn>
+  </v-container>
 </template>
 
 <script>
+import TableLists from "@/components/setting/TableLists.vue";
+
 export default {
   name: "Setting",
+  components: {
+    TableLists
+  },
   data() {
     return {
-      config: null
+      configLists: null
     };
   },
   created() {
@@ -39,9 +47,7 @@ export default {
      * listen to setting from sqlite3
      */
     this.$electron.ipcRenderer.on("rs:setting", (event, data) => {
-      console.log(data);
-
-      this.config = data;
+      this.configLists = data;
     });
   },
   methods: {
