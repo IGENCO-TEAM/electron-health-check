@@ -16,7 +16,7 @@ module.exports = defineConfig({
           icon: "src/assets/icons/favicon256.icns"
         },
         linux: {
-          icon: "src/assets/icons"
+          icon: "src/assets/icons/favicon256.icns"
         }
       }
     }
