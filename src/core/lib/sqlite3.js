@@ -1,8 +1,7 @@
 const fs = require("fs");
 const sqlite3 = require("sqlite3").verbose();
-// const filePath = __dirname + "./../src/data/database.db";
 const filePath = "database.db";
-console.log(`filePath : ${filePath}`);
+
 const createDbConnection = () => {
   if (fs.existsSync(filePath)) {
     return new sqlite3.Database(filePath);
