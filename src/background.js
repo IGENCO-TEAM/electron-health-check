@@ -1,3 +1,4 @@
+import path from "path";
 import { app, protocol, BrowserWindow, ipcMain, Tray, Menu } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
@@ -50,6 +51,34 @@ async function createWindow() {
     event.preventDefault();
     win.hide();
   });
+
+  /**
+   * Create tray
+   */
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: "Show",
+      click: () => {
+        win.show();
+      }
+    },
+    {
+      label: "Quit",
+      click: () => {
+        /**
+         * Quit app
+         */
+        win.destroy();
+        app.quit();
+      }
+    }
+  ]);
+  const trayIcon = process.env.WEBPACK_DEV_SERVER_URL
+    ? path.join(__dirname, `../public/img/Tray.ico`)
+    : path.join(__dirname, `../app.asar/img/Tray.ico`);
+  const tray = new Tray(trayIcon);
+  tray.setToolTip("App Health Check");
+  tray.setContextMenu(contextMenu);
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
@@ -150,35 +179,6 @@ app.on("ready", async () => {
    * Create window
    */
   createWindow();
-
-  /**
-   * Create tray
-   */
-  const contextMenu = Menu.buildFromTemplate([
-    {
-      label: "Show",
-      click: () => {
-        BrowserWindow.getAllWindows().forEach(win => {
-          win.show();
-        });
-      }
-    },
-    {
-      label: "Quit",
-      click: () => {
-        /**
-         * Quit app
-         */
-        BrowserWindow.getAllWindows().forEach(win => {
-          win.destroy();
-        });
-        app.quit();
-      }
-    }
-  ]);
-  const tray = new Tray("src/assets/icons/favicon.ico");
-  tray.setToolTip("App Health Check");
-  tray.setContextMenu(contextMenu);
 });
 
 // Exit cleanly on request from parent process in development mode.
