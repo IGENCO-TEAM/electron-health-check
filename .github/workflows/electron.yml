@@ -1,0 +1,86 @@
+name: Pre-Build Electron App
+
+#on:
+#  push:
+#    branches:
+#      - electron
+
+on: [pull_request]
+
+jobs:
+  build_on_linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Cache node_modules
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 18
+
+      - name: install dependencies
+        run: npm install
+
+      - name: Package Electron app
+        run: npm run linux:electron:build
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+  build_on_mac:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Cache node_modules
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+        if: runner.os == 'macOS'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 18
+
+      - name: install dependencies
+        run: npm install
+
+      - name: Package Electron app
+        run: npm run mac:electron:build
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+  build_on_win:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Cache node_modules
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 18
+
+      - name: install dependencies
+        run: npm install
+
+      - name: Package Electron app
+        run: npm run win:electron:build
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
