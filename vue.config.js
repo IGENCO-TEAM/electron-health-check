@@ -13,7 +13,7 @@ module.exports = defineConfig({
           icon: "src/assets/icons/favicon256.ico"
         },
         mac: {
-          icon: "src/assets/icons/favicon.icns"
+          icon: "src/assets/icons/favicon256.icns"
         },
         linux: {
           icon: "src/assets/icons"
