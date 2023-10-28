@@ -1,4 +1,4 @@
-import { app, protocol, BrowserWindow, ipcMain } from "electron";
+import { app, protocol, BrowserWindow, ipcMain, Tray, Menu } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 const isDevelopment = process.env.NODE_ENV !== "production";
@@ -17,6 +17,8 @@ async function createWindow() {
   const win = new BrowserWindow({
     width: 800,
     height: 600,
+    icon: "src/assets/icons/favicon.ico",
+    // skipTaskbar: true,
     webPreferences: {
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
@@ -36,6 +38,17 @@ async function createWindow() {
   win.webContents.setWindowOpenHandler(({ url }) => {
     require("electron").shell.openExternal(url);
     return { action: "deny" };
+  });
+
+  // eslint-disable-next-line no-unused-vars
+  win.on("close", function(event) {
+    event.preventDefault();
+    win.hide();
+  });
+
+  win.on("minimize", event => {
+    event.preventDefault();
+    win.hide();
   });
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
@@ -132,7 +145,40 @@ app.on("ready", async () => {
       console.error("Vue Devtools failed to install:", e.toString());
     }
   }
+
+  /**
+   * Create window
+   */
   createWindow();
+
+  /**
+   * Create tray
+   */
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: "Show",
+      click: () => {
+        BrowserWindow.getAllWindows().forEach(win => {
+          win.show();
+        });
+      }
+    },
+    {
+      label: "Quit",
+      click: () => {
+        /**
+         * Quit app
+         */
+        BrowserWindow.getAllWindows().forEach(win => {
+          win.destroy();
+        });
+        app.quit();
+      }
+    }
+  ]);
+  const tray = new Tray("src/assets/icons/favicon.ico");
+  tray.setToolTip("App Health Check");
+  tray.setContextMenu(contextMenu);
 });
 
 // Exit cleanly on request from parent process in development mode.
