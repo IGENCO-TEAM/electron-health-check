@@ -16,7 +16,7 @@
     "postuninstall": "electron-builder install-app-deps",
     "actions:build": "npx electron-builder --linux --windows --mac"
   },
-  "main": "src/background.js",
+  "main": "background.js",
   "dependencies": {
     "core-js": "^3.8.3",
     "node-os-utils": "^1.3.7",
