@@ -53,9 +53,9 @@ jobs:
           node-version: 18
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.8
+          python-version: '3.9'
           cache: 'pip'
 
       - name: install dependencies
