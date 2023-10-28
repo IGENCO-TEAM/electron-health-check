@@ -24,6 +24,8 @@ jobs:
 
       - name: Package Electron app
         run: npm run linux:electron:build
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
   build_on_mac:
     runs-on: macos-latest
     steps:
@@ -40,6 +42,8 @@ jobs:
 
       - name: Package Electron app
         run: npm run mac:electron:build
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
   build_on_win:
     runs-on: windows-latest
     steps:
@@ -56,3 +60,5 @@ jobs:
 
       - name: Package Electron app
         run: npm run win:electron:build
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
