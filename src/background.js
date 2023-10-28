@@ -5,13 +5,19 @@ import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 const isDevelopment = process.env.NODE_ENV !== "production";
 
 const db = require("./core/lib/sqlite3");
-
 const osu = require("node-os-utils");
+
+const { IncomingWebhook } = require("@slack/webhook");
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
   { scheme: "app", privileges: { secure: true, standard: true } }
 ]);
+
+const sendSlack = async (url, message) => {
+  const webhook = new IncomingWebhook(url);
+  await webhook.send(message);
+};
 
 async function createWindow() {
   // Create the browser window.
@@ -143,6 +149,99 @@ ipcMain.on("update:setting", (event, data) => {
         throw new Error(error.message);
       }
       event.sender.send("rs:update:setting", rows);
+    });
+  });
+});
+
+// eslint-disable-next-line no-unused-vars
+ipcMain.on("test:send:slack", (event, data) => {
+  /**
+   * get [SLACK_NAME_HOOK]
+   */
+  const sql = "SELECT * FROM setting WHERE name = 'SLACK_NAME_HOOK';";
+  db.get(sql, (error, row) => {
+    if (error) {
+      throw new Error(error.message);
+    }
+    const SLACK_NAME_HOOK = row.value;
+
+    /**
+     * get [SLACK_URL_HOOK]
+     */
+    const sqt = "SELECT * FROM setting WHERE name = 'SLACK_URL_HOOK';";
+    db.get(sqt, (err, d) => {
+      if (err) {
+        throw new Error(err.message);
+      }
+
+      const SLACK_URL_HOOK = d.value;
+
+      let bodyBlock = {};
+      bodyBlock.blocks = [];
+
+      /**
+       * Header Slack
+       */
+      let header = {
+        type: "header",
+        text: {
+          type: "plain_text",
+          text: `✅${SLACK_NAME_HOOK}✅`,
+          emoji: true
+        }
+      };
+      bodyBlock.blocks.push(header);
+
+      /**
+       * CPU Slack
+       */
+      let cpuMessage = "CPU works normally💚💚";
+      if (parseFloat(data.cpuPercentage) > 80) {
+        cpuMessage = "*Message:*\nCPU running more than 80% 🔥🔥";
+      }
+      let cpu = {
+        type: "section",
+        fields: [
+          {
+            type: "mrkdwn",
+            text: `*CPU Usage:*\n${data.cpuPercentage}%`
+          },
+          {
+            type: "mrkdwn",
+            text: cpuMessage
+          }
+        ]
+      };
+      bodyBlock.blocks.push(cpu);
+
+      /**
+       * Memory Slack
+       */
+      let memMessage = "Memory works normally💚💚";
+      if (parseFloat(data.memPercentage) > 80) {
+        memMessage = "*Message:*\nMemory running more than 80% 🔥🔥";
+      }
+      let mem = {
+        type: "section",
+        fields: [
+          {
+            type: "mrkdwn",
+            text: `*Memory Usage:*\n${data.memPercentage}%`
+          },
+          {
+            type: "mrkdwn",
+            text: memMessage
+          }
+        ]
+      };
+      bodyBlock.blocks.push(mem);
+
+      /**
+       * Send message to slack
+       */
+      sendSlack(SLACK_URL_HOOK, bodyBlock).then(() => {
+        event.sender.send("rs:test:send:slack", "success");
+      });
     });
   });
 });
