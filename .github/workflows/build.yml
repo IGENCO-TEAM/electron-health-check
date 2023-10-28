@@ -1,9 +1,9 @@
 name: Build Electron App
 
 on:
-  release:
-    types:
-      - created
+  push:
+    tags:
+      - v*
 
 jobs:
   build_on_linux:
