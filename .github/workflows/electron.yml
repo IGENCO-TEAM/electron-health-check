@@ -1,4 +1,4 @@
-name: Build Electron App
+name: Pre-Build Electron App
 
 #on:
 #  push:
