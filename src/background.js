@@ -1,4 +1,5 @@
-import { app, protocol, BrowserWindow, ipcMain } from "electron";
+import path from "path";
+import { app, protocol, BrowserWindow, ipcMain, Tray, Menu } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 const isDevelopment = process.env.NODE_ENV !== "production";
@@ -17,6 +18,8 @@ async function createWindow() {
   const win = new BrowserWindow({
     width: 800,
     height: 600,
+    icon: "src/assets/icons/favicon.ico",
+    // skipTaskbar: true,
     webPreferences: {
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
@@ -24,6 +27,58 @@ async function createWindow() {
       contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION
     }
   });
+
+  /**
+   * Hide menu bar
+   */
+  win.setMenuBarVisibility(false);
+
+  /**
+   * Allow openExternal link
+   */
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    require("electron").shell.openExternal(url);
+    return { action: "deny" };
+  });
+
+  // eslint-disable-next-line no-unused-vars
+  win.on("close", function(event) {
+    event.preventDefault();
+    win.hide();
+  });
+
+  win.on("minimize", event => {
+    event.preventDefault();
+    win.hide();
+  });
+
+  /**
+   * Create tray
+   */
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: "Show",
+      click: () => {
+        win.show();
+      }
+    },
+    {
+      label: "Quit",
+      click: () => {
+        /**
+         * Quit app
+         */
+        win.destroy();
+        app.quit();
+      }
+    }
+  ]);
+  const trayIcon = process.env.WEBPACK_DEV_SERVER_URL
+    ? path.join(__dirname, `../public/img/Tray.ico`)
+    : path.join(__dirname, `../app.asar/img/Tray.ico`);
+  const tray = new Tray(trayIcon);
+  tray.setToolTip("App Health Check");
+  tray.setContextMenu(contextMenu);
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
@@ -63,13 +118,32 @@ ipcMain.on("ping:disk", (event, data) => {
 // eslint-disable-next-line no-unused-vars
 ipcMain.on("get:setting", (event, data) => {
   const sql = "SELECT * FROM setting";
-  console.log(sql);
-  db.each(sql, (error, rows) => {
+  // get all
+  db.all(sql, (error, rows) => {
     if (error) {
       throw new Error(error.message);
     }
-    console.log(rows);
     event.sender.send("rs:setting", rows);
+  });
+});
+
+// eslint-disable-next-line no-unused-vars
+ipcMain.on("update:setting", (event, data) => {
+  const sql = `UPDATE setting SET value = '${data.value}' WHERE id = '${data.id}'`;
+  // update
+  db.run(sql, error => {
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    // get all
+    const sql = "SELECT * FROM setting";
+    db.all(sql, (error, rows) => {
+      if (error) {
+        throw new Error(error.message);
+      }
+      event.sender.send("rs:update:setting", rows);
+    });
   });
 });
 
@@ -100,6 +174,10 @@ app.on("ready", async () => {
       console.error("Vue Devtools failed to install:", e.toString());
     }
   }
+
+  /**
+   * Create window
+   */
   createWindow();
 });
 

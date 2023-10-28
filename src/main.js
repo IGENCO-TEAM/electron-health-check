@@ -27,6 +27,22 @@ const router = new VueRouter({
   routes: routers
 });
 
+// NavigationDuplicated error fix
+const originalPush = router.push;
+router.push = function push(location, onResolve, onReject) {
+  if (onResolve || onReject) {
+    return originalPush.call(this, location, onResolve, onReject);
+  }
+
+  return originalPush.call(this, location).catch(err => {
+    if (VueRouter.isNavigationFailure(err)) {
+      return err;
+    }
+
+    return Promise.reject(err);
+  });
+};
+
 Vue.config.productionTip = false;
 
 new Vue({

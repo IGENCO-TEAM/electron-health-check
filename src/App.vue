@@ -1,47 +1,25 @@
 <template>
   <v-app>
-    <v-app-bar app color="primary" dark>
-      <div class="d-flex align-center">
-        <v-img
-          alt="Vuetify Logo"
-          class="shrink mr-2"
-          contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
-          transition="scale-transition"
-          width="40"
-        />
-
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
-        />
-
-        <v-btn text @click="goToSettingMenu">
-          <span class="mr-2">SETTING</span>
-        </v-btn>
-      </div>
-
-      <v-spacer></v-spacer>
-
-      <v-btn href="https://igenco.co.th/" target="_blank" text>
-        <span class="mr-2">IGENCO</span>
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
-    </v-app-bar>
+    <main-header />
 
     <v-main>
       <router-view />
     </v-main>
+
+    <main-footer />
   </v-app>
 </template>
 
 <script>
+import Header from "@/components/layout/Header.vue";
+import Footer from "@/components/layout/Footer.vue";
+
 export default {
   name: "App",
+  components: {
+    "main-header": Header,
+    "main-footer": Footer
+  },
   mounted() {
     /**
      * default redirect to dashboard menu [/]
@@ -59,13 +37,4 @@ export default {
 };
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
+<style></style>

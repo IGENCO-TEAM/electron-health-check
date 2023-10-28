@@ -5,7 +5,20 @@ module.exports = defineConfig({
   transpileDependencies: ["vuetify"],
   pluginOptions: {
     electronBuilder: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      builderOptions: {
+        appId: "com.igenco.health-check",
+        productName: "Health Check",
+        win: {
+          icon: "src/assets/icons/favicon256.ico"
+        },
+        mac: {
+          icon: "src/assets/icons/favicon256.icns"
+        },
+        linux: {
+          icon: "src/assets/icons/favicon256.icns"
+        }
+      }
     }
   },
   configureWebpack: {
