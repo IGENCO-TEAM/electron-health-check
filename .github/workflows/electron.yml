@@ -11,33 +11,48 @@ jobs:
   build_on_linux:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@master
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
         with:
-          node-version: 14
+          node-version: 18
+
       - name: install dependencies
         run: npm install
-      - name: electron build
+
+      - name: Package Electron app
         run: npm run electron:build
   build_on_mac:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@master
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
         with:
-          node-version: 14
+          node-version: 18
+
       - name: install dependencies
         run: npm install
-      - name: electron build
+
+      - name: Package Electron app
         run: npm run electron:build
   build_on_win:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@master
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
         with:
-          node-version: 14
+          node-version: 18
+
       - name: install dependencies
         run: npm install
-      - name: electron build
+
+      - name: Package Electron app
         run: npm run electron:build
