@@ -23,7 +23,7 @@ jobs:
         run: npm install
 
       - name: Package Electron app
-        run: npm run electron:build
+        run: npm run linux:electron:build
   build_on_mac:
     runs-on: macos-latest
     steps:
@@ -39,7 +39,7 @@ jobs:
         run: npm install
 
       - name: Package Electron app
-        run: npm run electron:build
+        run: npm run mac:electron:build
   build_on_win:
     runs-on: windows-latest
     steps:
@@ -55,4 +55,4 @@ jobs:
         run: npm install
 
       - name: Package Electron app
-        run: npm run electron:build
+        run: npm run win:electron:build
