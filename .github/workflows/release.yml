@@ -45,11 +45,14 @@ jobs:
             id: set_artifact_filename
             run: |
                 if [ "${{ runner.os }}" = "Linux" ]; then
-                    echo "::set-output name=filename::dist_electron/*.AppImage appName=HealthCheck.AppImage"
+                    echo "::set-output name=filename::dist_electron/*.AppImage"
+                    echo "::set-output name=appName::HealthCheck.AppImage"
                 elif [ "${{ runner.os }}" = "macOS" ]; then
-                    echo "::set-output name=filename::dist_electron/*.dmg appName=HealthCheck.dmg"
+                    echo "::set-output name=filename::dist_electron/*.dmg"
+                    echo "::set-output name=appName::HealthCheck.dmg"
                 elif [ "${{ runner.os }}" = "Windows" ]; then
-                    echo "::set-output name=filename::dist_electron/*.exe appName=HealthCheck.exe"
+                    echo "::set-output name=filename::dist_electron/*.exe"
+                    echo "::set-output name=appName::HealthCheck.exe"
                 fi
             shell: bash
 
