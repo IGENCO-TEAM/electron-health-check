@@ -53,12 +53,16 @@ jobs:
                 fi
             shell: bash
 
-          - name: Create a Release and Upload Assets
-            uses: "marvinpinto/action-automatic-releases@latest"
+          - name: Create a Release
+            id: create_release
+            uses: actions/create-release@v1
+            env:
+              GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
             with:
-              repo_token: ${{ secrets.GH_TOKEN }}
+              tag_name: ${{ github.ref }}-${{matrix.os}}
+              release_name: MKPlugins-${{ github.ref }}-${{matrix.os}}
+              draft: false
               prerelease: false
-              files: ${{ steps.set_artifact_filename.outputs.filename }}
     
           - name: Upload Release Asset
             uses: actions/upload-artifact@v2
