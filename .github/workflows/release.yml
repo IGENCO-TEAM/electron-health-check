@@ -53,22 +53,27 @@ jobs:
                 fi
             shell: bash
 
+          # Publish build
           - name: Create a Release
+            if: github.run_number == 1
             id: create_release
             uses: actions/create-release@v1
             env:
               GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
             with:
-              tag_name: ${{ github.ref }}-${{matrix.os}}
-              release_name: MKPlugins-${{ github.ref }}-${{matrix.os}}
+              tag_name: ${{ github.ref }}
+              release_name: HealthCheck-${{ github.ref }}
               draft: false
               prerelease: false
     
+          # Upload binaries to release
           - name: Upload Release Asset
-            uses: actions/upload-artifact@v2
+            uses: svenstaro/upload-release-action@v2
             with:
-              name: Health Check Setup
-              path: ${{ steps.set_artifact_filename.outputs.filename }}
+                repo_token: ${{ secrets.GITHUB_TOKEN }}
+                file: ${{github.workspace}}/${{ steps.set_artifact_filename.outputs.filename }}
+                asset_name: HealthCheck-${{ steps.set_artifact_filename.outputs.filename }}
+                tag: ${{ github.ref }}
 
         #   - name: Create a Release and Upload Assets (Linux)
         #     uses: "marvinpinto/action-automatic-releases@latest"
