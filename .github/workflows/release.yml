@@ -44,11 +44,11 @@ jobs:
           - name: Determine artifact filename
             id: set_artifact_filename
             run: |
-                if [ "${{ runner.os }}" = "ubuntu-latest" ]; then
+                if [ "${{ runner.os }}" = "Linux" ]; then
                     echo "::set-output name=filename::dist_electron/*.AppImage"
-                elif [ "${{ runner.os }}" = "macos-latest" ]; then
+                elif [ "${{ runner.os }}" = "macOS" ]; then
                     echo "::set-output name=filename::dist_electron/*.dmg"
-                elif [ "${{ runner.os }}" = "windows-latest" ]; then
+                elif [ "${{ runner.os }}" = "Windows" ]; then
                     echo "::set-output name=filename::dist_electron/*.exe"
                 fi
             shell: bash
