@@ -41,47 +41,72 @@ jobs:
             env:
               GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-          - name: Create a Release and Upload Assets (Linux)
+          - name: Determine artifact filename
+            id: set_artifact_filename
+            run: |
+                if [ "${{ runner.os }}" = "ubuntu-latest" ]; then
+                    echo "::set-output name=filename::dist_electron/*.AppImage"
+                elif [ "${{ runner.os }}" = "macos-latest" ]; then
+                    echo "::set-output name=filename::dist_electron/*.dmg"
+                elif [ "${{ runner.os }}" = "windows-latest" ]; then
+                    echo "::set-output name=filename::dist_electron/*.exe"
+                fi
+            shell: bash
+
+          - name: Create a Release and Upload Assets
             uses: "marvinpinto/action-automatic-releases@latest"
             with:
-                repo_token: ${{ secrets.GH_TOKEN }}
-                prerelease: false
-                files: |
-                    ./dist_electron/*.AppImage
-
-          - name: Upload Release Asset (Linux)
+              repo_token: ${{ secrets.GH_TOKEN }}
+              prerelease: false
+              files: ${{ steps.set_artifact_filename.outputs.filename }}
+    
+          - name: Upload Release Asset
             uses: actions/upload-artifact@v2
             with:
-                name: Health Check Setup
-                path: |
-                    ./dist_electron/*.AppImage
+              name: Health Check Setup
+              path: ${{ steps.set_artifact_filename.outputs.filename }}
 
-          - name: Create a Release and Upload Assets (Mac)
-            uses: "marvinpinto/action-automatic-releases@latest"
-            with:
-                repo_token: ${{ secrets.GH_TOKEN }}
-                prerelease: false
-                files: |
-                    ./dist_electron/*.dmg
+        #   - name: Create a Release and Upload Assets (Linux)
+        #     uses: "marvinpinto/action-automatic-releases@latest"
+        #     with:
+        #         repo_token: ${{ secrets.GH_TOKEN }}
+        #         prerelease: false
+        #         files: |
+        #             ./dist_electron/*.AppImage
+
+        #   - name: Upload Release Asset (Linux)
+        #     uses: actions/upload-artifact@v2
+        #     with:
+        #         name: Health Check Setup
+        #         path: |
+        #             ./dist_electron/*.AppImage
+
+        #   - name: Create a Release and Upload Assets (Mac)
+        #     uses: "marvinpinto/action-automatic-releases@latest"
+        #     with:
+        #         repo_token: ${{ secrets.GH_TOKEN }}
+        #         prerelease: false
+        #         files: |
+        #             ./dist_electron/*.dmg
         
-          - name: Upload Release Asset (Mac)
-            uses: actions/upload-artifact@v2
-            with:
-                name: Health Check Setup
-                path: |
-                    ./dist_electron/*.dmg
+        #   - name: Upload Release Asset (Mac)
+        #     uses: actions/upload-artifact@v2
+        #     with:
+        #         name: Health Check Setup
+        #         path: |
+        #             ./dist_electron/*.dmg
 
-          - name: Create a Release and Upload Assets (Windows)
-            uses: "marvinpinto/action-automatic-releases@latest"
-            with:
-                repo_token: ${{ secrets.GH_TOKEN }}
-                prerelease: false
-                files: |
-                    ./dist_electron/*.exe
+        #   - name: Create a Release and Upload Assets (Windows)
+        #     uses: "marvinpinto/action-automatic-releases@latest"
+        #     with:
+        #         repo_token: ${{ secrets.GH_TOKEN }}
+        #         prerelease: false
+        #         files: |
+        #             ./dist_electron/*.exe
                 
-          - name: Upload Release Asset (Windows)
-            uses: actions/upload-artifact@v2
-            with:
-                name: Health Check Setup
-                path: |
-                    ./dist_electron/*.exe
+        #   - name: Upload Release Asset (Windows)
+        #     uses: actions/upload-artifact@v2
+        #     with:
+        #         name: Health Check Setup
+        #         path: |
+        #             ./dist_electron/*.exe
