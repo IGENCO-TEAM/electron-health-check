@@ -31,7 +31,18 @@ jobs:
                 repo_token: ${{ secrets.GH_TOKEN }}
                 automatic_release_tag: "${{ github.ref_name }}-latest"
                 prerelease: false
+                # multiple files are separated by newlines [.exe, .dmg, .AppImage]
                 files: |
+                    ./dist_electron/*.AppImage
+                    ./dist_electron/*.dmg
+                    ./dist_electron/*.exe
+
+          - name: Upload Release Asset Linux
+            uses: actions/upload-artifact@v2
+            with:
+                name: Health Check Setup
+                # multiple files are separated by newlines [.exe, .dmg, .AppImage]
+                path: |
                     ./dist_electron/*.AppImage
                     ./dist_electron/*.dmg
                     ./dist_electron/*.exe
