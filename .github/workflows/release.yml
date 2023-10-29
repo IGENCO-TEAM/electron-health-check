@@ -39,15 +39,14 @@ jobs:
         #       path: ./dist_electron/*.AppImage
 
           - name: Create a Release
-            id: create_release_linux
-            uses: actions/create-release@v1
-            env:
-              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            uses: "marvinpinto/action-automatic-releases@latest"
             with:
-              tag_name: ${{ github.ref }}
-              release_name: Release ${{ github.ref }}
-              draft: false
-              prerelease: false
+                repo_token: ${{ secrets.GH_TOKEN }}
+                prerelease: false
+                files: |
+                    ./dist_electron/*.AppImage
+                    ./dist_electron/*.dmg
+                    ./dist_electron/*.exe
     # build_on_mac:
     # runs-on: macos-latest
     # steps:
