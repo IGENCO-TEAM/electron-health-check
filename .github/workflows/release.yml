@@ -23,8 +23,21 @@ jobs:
           - name: install dependencies
             run: npm install
     
-          - name: Package Electron app
-            run: npm run electron:build
+          - name: Package Electron app for Linux
+            if: matrix.os == 'ubuntu-latest'
+            run: npm run linux:electron:build
+            env:
+              GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+          - name: Package Electron app for Mac
+            if: matrix.os == 'macos-latest'
+            run: npm run mac:electron:build
+            env:
+              GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+          - name: Package Electron app for Windows
+            if: matrix.os == 'windows-latest'
+            run: npm run win:electron:build
             env:
               GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
