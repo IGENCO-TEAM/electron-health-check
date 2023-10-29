@@ -6,18 +6,14 @@ on:
         - 'v*'
 
 jobs:
-    build_on_linux:
-        runs-on: ubuntu-latest
+    build_and_release:
+        runs-on: ${{matrix.os}}
+        strategy:
+            matrix:
+                os: [ubuntu-latest, macos-latest, windows-latest]
         steps:
           - name: Checkout code
             uses: actions/checkout@v2
-    
-          - name: Cache node_modules
-            uses: actions/cache@v2
-            with:
-              path: |
-                node_modules
-              key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
     
           - name: Set up Node.js
             uses: actions/setup-node@v2
@@ -27,88 +23,105 @@ jobs:
           - name: install dependencies
             run: npm install
     
-          - name: Package Electron app
+          - name: Package Electron app for Linux
+            if: matrix.os == 'ubuntu-latest'
             run: npm run linux:electron:build
             env:
               GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+          - name: Package Electron app for Mac
+            if: matrix.os == 'macos-latest'
+            run: npm run mac:electron:build
+            env:
+              GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+          - name: Package Electron app for Windows
+            if: matrix.os == 'windows-latest'
+            run: npm run win:electron:build
+            env:
+              GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+          - name: Determine artifact filename
+            id: set_artifact_filename
+            run: |
+                if [ "${{ runner.os }}" = "Linux" ]; then
+                    echo "::set-output name=filename::dist_electron/*.AppImage"
+                    echo "::set-output name=appName::HealthCheck.AppImage"
+                elif [ "${{ runner.os }}" = "macOS" ]; then
+                    echo "::set-output name=filename::dist_electron/*.dmg"
+                    echo "::set-output name=appName::HealthCheck.dmg"
+                elif [ "${{ runner.os }}" = "Windows" ]; then
+                    echo "::set-output name=filename::dist_electron/*.exe"
+                    echo "::set-output name=appName::HealthCheck.exe"
+                fi
+            shell: bash
+
+          # Publish build
+          - name: Create a Release
+            if: github.run_number == 1
+            id: create_release
+            uses: actions/create-release@v1
+            env:
+              GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+            with:
+              tag_name: ${{ github.ref }}
+              release_name: HealthCheck-${{ github.ref }}
+              draft: false
+              prerelease: false
     
-        #   - name: Upload Release Asset Linux
+          # Upload binaries to release
+          - name: Upload Release Asset
+            uses: svenstaro/upload-release-action@v2
+            with:
+                repo_token: ${{ secrets.GITHUB_TOKEN }}
+                # file: ${{github.workspace}}/${{ steps.set_artifact_filename.outputs.filename }}
+                file: ./${{ steps.set_artifact_filename.outputs.filename }}
+                asset_name: ${{ steps.set_artifact_filename.outputs.appName }}
+                tag: ${{ github.ref }}
+                overwrite: true
+                file_glob: true
+
+        #   - name: Create a Release and Upload Assets (Linux)
+        #     uses: "marvinpinto/action-automatic-releases@latest"
+        #     with:
+        #         repo_token: ${{ secrets.GH_TOKEN }}
+        #         prerelease: false
+        #         files: |
+        #             ./dist_electron/*.AppImage
+
+        #   - name: Upload Release Asset (Linux)
         #     uses: actions/upload-artifact@v2
         #     with:
-        #       name: Health Check Setup
-        #       path: ./dist_electron/*.AppImage
+        #         name: Health Check Setup
+        #         path: |
+        #             ./dist_electron/*.AppImage
 
-          - name: Create a Release
-            uses: "marvinpinto/action-automatic-releases@latest"
-            with:
-                repo_token: ${{ secrets.GH_TOKEN }}
-                automatic_release_tag: "latest"
-                prerelease: false
-                files: |
-                    ./dist_electron/*.AppImage
-                    ./dist_electron/*.dmg
-                    ./dist_electron/*.exe
-    # build_on_mac:
-    # runs-on: macos-latest
-    # steps:
-    #     - name: Checkout code
-    #     uses: actions/checkout@v2
-
-    #     - name: Cache node_modules
-    #     uses: actions/cache@v2
-    #     with:
-    #         path: |
-    #         node_modules
-    #         key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
-    #     if: runner.os == 'macOS'
-
-    #     - name: Set up Node.js
-    #     uses: actions/setup-node@v2
-    #     with:
-    #         node-version: 18
-
-    #     - name: install dependencies
-    #     run: npm install
-
-    #     - name: Package Electron app
-    #     run: npm run mac:electron:build
-    #     env:
-    #         GH_TOKEN: ${{ secrets.GH_TOKEN }}
-
-    #     # - name: Upload Release Asset Mac
-    #     #   uses: actions/upload-artifact@v2
-    #     #   with:
-    #     #     name: Health Check Setup
-    #     #     path: ./dist_electron/*.dmg
-    # build_on_win:
-    #     runs-on: windows-latest
-    #     steps:
-    #       - name: Checkout code
-    #         uses: actions/checkout@v2
-    
-    #       - name: Cache node_modules
-    #         uses: actions/cache@v2
-    #         with:
-    #           path: |
-    #             node_modules
-    #           key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
-    
-    #       - name: Set up Node.js
-    #         uses: actions/setup-node@v2
-    #         with:
-    #           node-version: 18
-    
-    #       - name: install dependencies
-    #         run: npm install
-    
-    #       - name: Package Electron app
-    #         run: npm run win:electron:build
-    #         env:
-    #           GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        #   - name: Create a Release and Upload Assets (Mac)
+        #     uses: "marvinpinto/action-automatic-releases@latest"
+        #     with:
+        #         repo_token: ${{ secrets.GH_TOKEN }}
+        #         prerelease: false
+        #         files: |
+        #             ./dist_electron/*.dmg
         
-    #       # - name: Upload Release Asset Windows
-    #       #   uses: actions/upload-artifact@v2
-    #       #   with:
-    #       #     name: Health Check Setup
-    #       #     path: ./dist_electron/*.exe
-    
+        #   - name: Upload Release Asset (Mac)
+        #     uses: actions/upload-artifact@v2
+        #     with:
+        #         name: Health Check Setup
+        #         path: |
+        #             ./dist_electron/*.dmg
+
+        #   - name: Create a Release and Upload Assets (Windows)
+        #     uses: "marvinpinto/action-automatic-releases@latest"
+        #     with:
+        #         repo_token: ${{ secrets.GH_TOKEN }}
+        #         prerelease: false
+        #         files: |
+        #             ./dist_electron/*.exe
+                
+        #   - name: Upload Release Asset (Windows)
+        #     uses: actions/upload-artifact@v2
+        #     with:
+        #         name: Health Check Setup
+        #         path: |
+        #             ./dist_electron/*.exe
