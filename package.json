@@ -8,9 +8,9 @@
     "lint": "vue-cli-service lint",
     "electron:serve": "vue-cli-service electron:serve",
     "electron:build": "vue-cli-service electron:build",
-    "linux:electron:build": "export NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service electron:build",
-    "win:electron:build": "set NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service electron:build",
-    "mac:electron:build": "export NODE_OPTIONS=--openssl-legacy-provider && export CSC_IDENTITY_AUTO_DISCOVERY=false && vue-cli-service electron:build",
+    "Linux:electron:build": "export NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service electron:build",
+    "Windows:electron:build": "set NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service electron:build",
+    "macOS:electron:build": "export NODE_OPTIONS=--openssl-legacy-provider && export CSC_IDENTITY_AUTO_DISCOVERY=false && vue-cli-service electron:build",
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps",
     "actions:build": "npx electron-builder --linux --windows --mac"

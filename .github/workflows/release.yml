@@ -1,64 +1,51 @@
 name: Publish Release
 
 on:
-    push:
-      tags:
-        - 'v*'
+  push:
+    tags:
+      - 'v*'
 
 jobs:
-    build_and_release:
-        runs-on: ${{matrix.os}}
-        strategy:
-            matrix:
-                os: [ubuntu-latest, macos-latest, windows-latest]
-        steps:
-          - name: Checkout code
-            uses: actions/checkout@v2
-    
-          - name: Set up Node.js
-            uses: actions/setup-node@v2
-            with:
-              node-version: 18
-    
-          - name: install dependencies
-            run: npm install
-    
-          - name: Package Electron app for Linux
-            if: matrix.os == 'ubuntu-latest'
-            run: npm run linux:electron:build
-            env:
-              GH_TOKEN: ${{ secrets.GH_TOKEN }}
+  build_and_release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-          - name: Package Electron app for Mac
-            if: matrix.os == 'macos-latest'
-            run: npm run mac:electron:build
-            env:
-              GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 18
 
-          - name: Package Electron app for Windows
-            if: matrix.os == 'windows-latest'
-            run: npm run win:electron:build
-            env:
-              GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      - name: Install dependencies
+        run: npm install
 
-          - name: Create a Release
-            uses: "marvinpinto/action-automatic-releases@latest"
-            with:
-                repo_token: ${{ secrets.GH_TOKEN }}
-                automatic_release_tag: "${{ github.ref_name }}-latest"
-                prerelease: false
-                # multiple files are separated by newlines [.exe, .dmg, .AppImage]
-                files: |
-                    ./dist_electron/*.AppImage
-                    ./dist_electron/*.dmg
-                    ./dist_electron/*.exe
+      - name: Build Electron app
+        run: npm run ${{ runner.os }}:electron:build
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-          - name: Upload Release Asset Linux
-            uses: actions/upload-artifact@v2
-            with:
-                name: Health Check Setup
-                # multiple files are separated by newlines [.exe, .dmg, .AppImage]
-                path: |
-                    ./dist_electron/*.AppImage
-                    ./dist_electron/*.dmg
-                    ./dist_electron/*.exe
+      - name: Determine artifact filename
+        id: set_artifact_filename
+        run: |
+          if [ "${{ runner.os }}" = "Linux" ]; then
+            echo "::set-output name=filename::dist_electron/*.AppImage"
+          elif [ "${{ runner.os }}" = "macOS" ]; then
+            echo "::set-output name=filename::dist_electron/*.dmg"
+          elif [ "${{ runner.os }}" = "Windows" ]; then
+            echo "::set-output name=filename::dist_electron/*.exe"
+          fi
+        shell: bash
+
+      - name: Create a Release and Upload Assets
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: ${{ secrets.GH_TOKEN }}
+          prerelease: false
+          files: ${{ steps.set_artifact_filename.outputs.filename }}
+
+      - name: Upload Release Asset
+        uses: actions/upload-artifact@v2
+        with:
+          name: Health Check Setup
+          path: ${{ steps.set_artifact_filename.outputs.filename }}

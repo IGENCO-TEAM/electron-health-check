@@ -30,7 +30,7 @@ jobs:
         run: npm install
 
       - name: Package Electron app
-        run: npm run linux:electron:build
+        run: npm run Linux:electron:build
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
@@ -62,7 +62,7 @@ jobs:
         run: npm install
 
       - name: Package Electron app
-        run: npm run mac:electron:build
+        run: npm run macOS:electron:build
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
@@ -93,7 +93,7 @@ jobs:
         run: npm install
 
       - name: Package Electron app
-        run: npm run win:electron:build
+        run: npm run Windows:electron:build
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
     
