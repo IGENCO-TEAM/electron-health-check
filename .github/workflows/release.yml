@@ -45,11 +45,11 @@ jobs:
             id: set_artifact_filename
             run: |
                 if [ "${{ runner.os }}" = "Linux" ]; then
-                    echo "::set-output name=filename::dist_electron/*.AppImage"
+                    echo "::set-output name=filename::dist_electron/*.AppImage appName=HealthCheck.AppImage"
                 elif [ "${{ runner.os }}" = "macOS" ]; then
-                    echo "::set-output name=filename::dist_electron/*.dmg"
+                    echo "::set-output name=filename::dist_electron/*.dmg appName=HealthCheck.dmg"
                 elif [ "${{ runner.os }}" = "Windows" ]; then
-                    echo "::set-output name=filename::dist_electron/*.exe"
+                    echo "::set-output name=filename::dist_electron/*.exe appName=HealthCheck.exe"
                 fi
             shell: bash
 
@@ -71,9 +71,12 @@ jobs:
             uses: svenstaro/upload-release-action@v2
             with:
                 repo_token: ${{ secrets.GITHUB_TOKEN }}
-                file: ${{ steps.set_artifact_filename.outputs.filename }}
-                asset_name: HealthCheck-${{ steps.set_artifact_filename.outputs.filename }}
+                # file: ${{github.workspace}}/${{ steps.set_artifact_filename.outputs.filename }}
+                file: ./${{ steps.set_artifact_filename.outputs.filename }}
+                asset_name: ${{ steps.set_artifact_filename.outputs.appName }}
                 tag: ${{ github.ref }}
+                overwrite: true
+                file_glob: true
 
         #   - name: Create a Release and Upload Assets (Linux)
         #     uses: "marvinpinto/action-automatic-releases@latest"
